@@ -1,18 +1,18 @@
-from flask import send_file
-from file_sharing_service.configs.flask_configuration import api, mail
+from file_sharing_service.broker.event_handlers import emit_sending
+from file_sharing_service.configs.flask_configuration import api
+from file_sharing_service.configs import rabbit_configuration
 from flask_restful import Resource
-from flask_mail import Message
 
 
 class EmailSendingView(Resource):
-    def get(self):
-        msg = Message("Hello",
-                      sender="testingforserve@gmail.com",
-                      recipients=["qwertttyew@dmailpro.net"])
-        msg.body = 'asdasd'
-        mail.send(msg)
+    def get(self, file):
+        emit_sending(
+            file,
+            queue_name=rabbit_configuration.email_queue_name,
+            routing_key=rabbit_configuration.email_routing_key
+        )
 
-        return 'message'
+        return 200
 
 
-api.add_resource(EmailSendingView, '/email')
+api.add_resource(EmailSendingView, '/email/<string:file>')
