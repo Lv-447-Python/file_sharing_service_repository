@@ -1,7 +1,8 @@
+import json
 import pika
 
 
-def emit_sending(file, queue_name, routing_key):
+def emit_sending(file_data, queue_name, routing_key):
     connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
     channel = connection.channel()
 
@@ -17,12 +18,12 @@ def emit_sending(file, queue_name, routing_key):
     channel.basic_publish(
         exchange=exchange_name,
         routing_key=routing_key,
-        body=file,
+        body=json.dumps(file_data),
 
         properties=pika.BasicProperties(
             delivery_mode=2
         )
     )
 
-    print(f'{routing_key} sent to {exchange_name} with message {file}')
+    print(f'{routing_key} sent to {exchange_name} with message {file_data}')
     connection.close()
