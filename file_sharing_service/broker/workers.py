@@ -1,5 +1,16 @@
 import pika
 from file_sharing_service.broker.send_email_worker import send_email
+from file_sharing_service.broker.generate_link_worker import send_file
+
+
+def callback(ch, method, properties, body):
+    if method.routing_key == 'email_sending':
+        send_email(body)
+    elif method.routing_key == 'files_sending':
+        send_file(body)
+        print('file sent')
+    else:
+        print('Invalid routing key')
 
 
 def manage_jobs(queue_name, binding_key):
@@ -23,14 +34,7 @@ def manage_jobs(queue_name, binding_key):
 
     print('[*] Waiting for messages')
 
-    def callback(ch, method, properties, body):
-        if method.routing_key == 'email_sending':
-            send_email(str(body))
-        elif method.routing_key == 'files_sending':
-            print('file sent')
-        else:
-            print('Invalid routing key')
-
+    channel.basic_qos(prefetch_count=1)
     channel.basic_consume(
         queue=queue_name,
         on_message_callback=callback,
