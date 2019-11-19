@@ -5,11 +5,29 @@ from email import encoders
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from .generate_link_worker import get_filepath
+import ast
 
 
-def send_email(text_body):
-    subject = 'Email with attachment'
-    body = text_body
+def parse_file_data(bytes_data):
+    file_data_decoded = bytes_data.decode('utf-8')
+    file_data_dict = ast.literal_eval(file_data_decoded)
+    user_id = int(file_data_dict['user_id'])
+    filter_id = int(file_data_dict['filter_id'])
+    file_id = int(file_data_dict['file_id'])
+
+    file_data = {
+        'user_id': user_id,
+        'filter_id': filter_id,
+        'file_id': file_id
+    }
+
+    return file_data
+
+
+def send_email(file_data):
+    subject = 'FilterMe File'
+    body = '''This email was sent by FilterMe. Your file was successfully generated.'''
 
     message = MIMEMultipart()
     message['From'] = smtp_configuration.sender_email
@@ -17,7 +35,11 @@ def send_email(text_body):
     message['Subject'] = subject
     message.attach(MIMEText(body, 'plain'))
 
-    filename = 'homes.csv'
+    params_to_get_filename = parse_file_data(file_data)
+
+    filename = get_filepath(params_to_get_filename['user_id'],
+                            params_to_get_filename['filter_id'],
+                            params_to_get_filename['file_id'])
 
     with open(filename, 'rb') as attachment:
         part = MIMEBase('application', 'octet-stream')
