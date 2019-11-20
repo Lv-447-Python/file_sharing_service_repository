@@ -2,7 +2,6 @@ from file_sharing_service.broker.event_handlers import emit_sending
 from file_sharing_service.configs.flask_configuration import api
 from file_sharing_service.configs import rabbit_configuration
 from flask_restful import Resource
-from flask_restful import http_status_message
 from flask import request
 
 
@@ -11,7 +10,8 @@ class EmailSendingView(Resource):
         file_data = {
             'user_id': request.args.get('user_id', type=int),
             'file_id': request.args.get('file_id', type=int),
-            'filter_id': request.args.get('filter_id', type=int)
+            'filter_id': request.args.get('filter_id', type=int),
+            'email': request.args.get('email', type=str)
         }
 
         emit_sending(
@@ -20,7 +20,10 @@ class EmailSendingView(Resource):
             routing_key=rabbit_configuration.email_routing_key
         )
 
-        return http_status_message(200)
+        return {
+            'status': 200,
+            'msg': 'Message was sent to the queue ' + rabbit_configuration.email_queue_name
+        }
 
 
 api.add_resource(EmailSendingView, '/email')

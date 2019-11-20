@@ -1,28 +1,11 @@
 from file_sharing_service.configs import smtp_configuration
+from .generate_link_worker import get_filepath
 import smtplib
 import ssl
 from email import encoders
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from .generate_link_worker import get_filepath
-import ast
-
-
-def parse_file_data(bytes_data):
-    file_data_decoded = bytes_data.decode('utf-8')
-    file_data_dict = ast.literal_eval(file_data_decoded)
-    user_id = int(file_data_dict['user_id'])
-    filter_id = int(file_data_dict['filter_id'])
-    file_id = int(file_data_dict['file_id'])
-
-    file_data = {
-        'user_id': user_id,
-        'filter_id': filter_id,
-        'file_id': file_id
-    }
-
-    return file_data
 
 
 def send_email(file_data):
@@ -31,19 +14,21 @@ def send_email(file_data):
 
     message = MIMEMultipart()
     message['From'] = smtp_configuration.sender_email
-    message['To'] = smtp_configuration.receiver_email
+    message['To'] = file_data['email']
     message['Subject'] = subject
     message.attach(MIMEText(body, 'plain'))
 
-    params_to_get_filename = parse_file_data(file_data)
+    filename = get_filepath(file_data['user_id'],
+                            file_data['filter_id'],
+                            file_data['file_id'])
 
-    filename = get_filepath(params_to_get_filename['user_id'],
-                            params_to_get_filename['filter_id'],
-                            params_to_get_filename['file_id'])
-
-    with open(filename, 'rb') as attachment:
-        part = MIMEBase('application', 'octet-stream')
-        part.set_payload(attachment.read())
+    try:
+        with open(filename, 'rb') as attachment:
+            part = MIMEBase('application', 'octet-stream')
+            part.set_payload(attachment.read())
+    except FileNotFoundError:
+        print('File not found')
+        return None
 
     encoders.encode_base64(part)
 
@@ -56,5 +41,3 @@ def send_email(file_data):
     with smtplib.SMTP_SSL('smtp.gmail.com', port=smtp_configuration.port, context=context) as server:
         server.login(smtp_configuration.sender_email, smtp_configuration.sender_password)
         server.sendmail(smtp_configuration.sender_email, smtp_configuration.receiver_email, text)
-
-    print('Email was sent')

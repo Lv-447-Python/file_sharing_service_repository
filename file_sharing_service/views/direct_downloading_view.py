@@ -3,6 +3,7 @@ from file_sharing_service.configs import rabbit_configuration
 from file_sharing_service.configs.flask_configuration import api
 from flask_restful import Resource
 from flask import request, send_file
+from flask_restful import http_status_message
 
 
 class DownloadingLinkView(Resource):
@@ -12,20 +13,25 @@ class DownloadingLinkView(Resource):
             'file_id': request.args.get('file_id', type=int),
             'filter_id': request.args.get('filter_id', type=int)
         }
-        print('qweqw')
         emit_sending(
             file_data,
             queue_name=rabbit_configuration.file_queue_name,
             routing_key=rabbit_configuration.file_routing_key
         )
 
-        return 200
+        return {
+            'status': 200,
+            'msg': 'Message was sent to the queue ' + rabbit_configuration.file_queue_name
+        }
 
 
 class DirectDownloadingView(Resource):
     def get(self):
-        filepath = request.args.get('filepath', type=str)
-        return send_file(filepath, as_attachment=True)
+        try:
+            filepath = request.args.get('filepath', type=str)
+            return send_file(filepath, as_attachment=True)
+        except FileNotFoundError:
+            return http_status_message(404)
 
 
 api.add_resource(DirectDownloadingView, '/download')

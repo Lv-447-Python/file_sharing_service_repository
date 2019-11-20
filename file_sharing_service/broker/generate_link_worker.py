@@ -1,5 +1,4 @@
 import requests
-from file_sharing_service.configs.flask_configuration import api
 
 
 def get_filepath(user_id, filter_id, file_id):
@@ -7,7 +6,6 @@ def get_filepath(user_id, filter_id, file_id):
 
     json_response = response.json()
     filepath = json_response['filepath']
-
     return filepath
 
 
