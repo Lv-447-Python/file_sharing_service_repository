@@ -1,3 +1,4 @@
+"""The main worker file """
 import ast
 import pika
 from file_sharing_service.broker.send_email_worker import send_email
@@ -42,18 +43,14 @@ def callback(ch, method, properties, body):
     else:
         print('Invalid routing key')
 
+    return method.routing_key
+
 
 def manage_jobs(queue_name, binding_key):
     connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
     channel = connection.channel()
 
     exchange_name = 'exchange_files'
-
-    channel.exchange_declare(
-        exchange=exchange_name,
-        exchange_type='direct',
-        durable=True
-    )
 
     queue_choose = channel.queue_declare(queue=queue_name)
     queue_chosen = queue_choose.method.queue

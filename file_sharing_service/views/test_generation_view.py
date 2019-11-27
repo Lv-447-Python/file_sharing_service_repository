@@ -1,5 +1,6 @@
-from file_sharing_service.configs.flask_configuration import api
+"""Test GenerateFileView"""
 from flask_restful import Resource
+from file_sharing_service.configs.flask_configuration import API
 
 
 class GenerateFileView(Resource):
@@ -12,4 +13,4 @@ class GenerateFileView(Resource):
         return response
 
 
-api.add_resource(GenerateFileView, '/generate')
+API.add_resource(GenerateFileView, '/generate')

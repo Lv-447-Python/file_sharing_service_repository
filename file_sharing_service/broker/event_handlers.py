@@ -1,3 +1,4 @@
+"""RabbitMQ Producer"""
 import json
 import pika
 

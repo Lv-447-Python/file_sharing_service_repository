@@ -1,8 +1,9 @@
-from file_sharing_service.broker.event_handlers import emit_sending
-from file_sharing_service.configs.flask_configuration import api
-from file_sharing_service.configs import rabbit_configuration
-from flask_restful import Resource
+"""View for sending email with file"""
 from flask import request
+from flask_restful import Resource
+from file_sharing_service.broker.event_handlers import emit_sending
+from file_sharing_service.configs.flask_configuration import API
+from file_sharing_service.configs import rabbit_configuration
 
 
 class EmailSendingView(Resource):
@@ -16,14 +17,14 @@ class EmailSendingView(Resource):
 
         emit_sending(
             file_data,
-            queue_name=rabbit_configuration.email_queue_name,
-            routing_key=rabbit_configuration.email_routing_key
+            queue_name=rabbit_configuration.EMAIL_QUEUE_NAME,
+            routing_key=rabbit_configuration.EMAIL_ROUTING_KEY
         )
 
         return {
             'status': 200,
-            'msg': 'Message was sent to the queue ' + rabbit_configuration.email_queue_name
+            'msg': 'Message was sent to the queue ' + rabbit_configuration.EMAIL_QUEUE_NAME
         }
 
 
-api.add_resource(EmailSendingView, '/email')
+API.add_resource(EmailSendingView, '/email')

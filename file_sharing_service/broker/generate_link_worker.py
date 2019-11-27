@@ -1,8 +1,10 @@
+"""File for downloading link generation"""
 import requests
 
 
 def get_filepath(user_id, filter_id, file_id):
-    response = requests.get(f'http://localhost:5000/generate?file_id={file_id}&filter_id={filter_id}&user_id={user_id}')
+    api_call = f'http://localhost:5000/generate?file_id={file_id}&filter_id={filter_id}&user_id={user_id}'
+    response = requests.get(api_call)
 
     json_response = response.json()
     filepath = json_response['filepath']

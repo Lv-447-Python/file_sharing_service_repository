@@ -1,3 +1,4 @@
+"""Worker run file"""
 from file_sharing_service.broker.workers import manage_jobs
 import sys
 

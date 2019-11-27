@@ -1,9 +1,9 @@
+"""View for generation link and downloading file"""
+from flask import request, send_file
+from flask_restful import Resource, http_status_message
 from file_sharing_service.broker.event_handlers import emit_sending
 from file_sharing_service.configs import rabbit_configuration
-from file_sharing_service.configs.flask_configuration import api
-from flask_restful import Resource
-from flask import request, send_file
-from flask_restful import http_status_message
+from file_sharing_service.configs.flask_configuration import API
 
 
 class DownloadingLinkView(Resource):
@@ -15,13 +15,13 @@ class DownloadingLinkView(Resource):
         }
         emit_sending(
             file_data,
-            queue_name=rabbit_configuration.file_queue_name,
-            routing_key=rabbit_configuration.file_routing_key
+            queue_name=rabbit_configuration.FILE_QUEUE_NAME,
+            routing_key=rabbit_configuration.FILE_ROUTING_KEY
         )
 
         return {
             'status': 200,
-            'msg': 'Message was sent to the queue ' + rabbit_configuration.file_queue_name
+            'msg': 'Message was sent to the queue ' + rabbit_configuration.FILE_QUEUE_NAME
         }
 
 
@@ -34,5 +34,5 @@ class DirectDownloadingView(Resource):
             return http_status_message(404)
 
 
-api.add_resource(DirectDownloadingView, '/download')
-api.add_resource(DownloadingLinkView, '/download-link')
+API.add_resource(DirectDownloadingView, '/download')
+API.add_resource(DownloadingLinkView, '/download-link')

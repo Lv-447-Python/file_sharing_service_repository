@@ -1,7 +1,7 @@
-# producer configs
+"""Producer configs"""
 
-email_queue_name = 'email_queue'
-email_routing_key = 'email_sending'
+EMAIL_QUEUE_NAME = 'email_queue'
+EMAIL_ROUTING_KEY = 'email_sending'
 
-file_queue_name = 'file_queue'
-file_routing_key = 'files_sending'
+FILE_QUEUE_NAME = 'file_queue'
+FILE_ROUTING_KEY = 'files_sending'
