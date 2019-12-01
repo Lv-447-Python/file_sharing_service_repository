@@ -24,5 +24,5 @@ DB_URL = 'postgresql+psycopg2://{user}:{pw}@{url}/{db}'.format(
 APP.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://{user}:{pw}@{url}/{db}'
 APP.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-database = SQLAlchemy(APP)
-ma = Marshmallow(APP)
+DATABASE = SQLAlchemy(APP)
+MARSHMALLOW = Marshmallow(APP)
