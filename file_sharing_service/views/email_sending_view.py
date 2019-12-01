@@ -2,7 +2,7 @@
 from flask import request
 from flask_restful import Resource
 from file_sharing_service.broker.event_handlers import emit_sending
-from file_sharing_service.configs.flask_configuration import API
+from file_sharing_service import API
 from file_sharing_service.configs import rabbit_configuration
 
 

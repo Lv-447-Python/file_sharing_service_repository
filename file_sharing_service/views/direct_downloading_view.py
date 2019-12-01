@@ -3,7 +3,7 @@ from flask import request, send_file
 from flask_restful import Resource, http_status_message
 from file_sharing_service.broker.event_handlers import emit_sending
 from file_sharing_service.configs import rabbit_configuration
-from file_sharing_service.configs.flask_configuration import API
+from file_sharing_service import API
 
 
 class DownloadingLinkView(Resource):

@@ -1,4 +1,5 @@
-from file_sharing_service.configs.flask_configuration import APP
+# from file_sharing_service.configs.flask_configuration import APP
+from file_sharing_service import APP
 from file_sharing_service.views.direct_downloading_view import DirectDownloadingView
 from file_sharing_service.views.direct_downloading_view import DownloadingLinkView
 from file_sharing_service.views.email_sending_view import EmailSendingView
