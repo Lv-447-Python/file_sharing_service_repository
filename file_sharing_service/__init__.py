@@ -2,6 +2,8 @@
 from flask import Flask
 from flask_restful import Api
 from flask_sqlalchemy import SQLAlchemy
+from flask_marshmallow import Marshmallow
+
 
 APP = Flask(__name__)
 API = Api(APP)
@@ -23,3 +25,4 @@ APP.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://{user}:{pw}@{url}
 APP.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 database = SQLAlchemy(APP)
+ma = Marshmallow(APP)
