@@ -1,10 +1,8 @@
-# from file_sharing_service.configs.flask_configuration import APP
-from file_sharing_service import APP
-from file_sharing_service.views.direct_downloading_view import DirectDownloadingView
-from file_sharing_service.views.direct_downloading_view import DownloadingLinkView
+from file_sharing_service import APP, HOST, PORT
+from file_sharing_service.views.direct_downloading_view import GeneratedFileLoading, GeneratedFileInterface
 from file_sharing_service.views.email_sending_view import EmailSendingView
-from file_sharing_service.views.test_generation_view import GenerateFileView
+from file_sharing_service.views.generated_files_view import GeneratedFileView
 
 
 if __name__ == '__main__':
-    APP.run()
+    APP.run(host=HOST, port=PORT)
