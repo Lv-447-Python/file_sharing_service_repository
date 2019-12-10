@@ -13,7 +13,7 @@ from file_sharing_service import APP
 
 def make_archive(filepath):
     zip_filename = f'{filepath}.zip'
-    zip_file = zipfile.ZipFile(zip_filename, 'w')
+    zip_file = zipfile.ZipFile(filepath, 'w')
     zip_file.write(filepath, compress_type=zipfile.ZIP_DEFLATED)
     zip_file.close()
 
@@ -63,6 +63,6 @@ def send_email(file_data):
         server.login(smtp_configuration.SENDER_EMAIL, smtp_configuration.SENDER_PASSWORD)
         server.sendmail(smtp_configuration.SENDER_EMAIL, receiver_email, text)
 
-    if filename.split('.')[-1] == 'zip':
+    if filename.endswith('zip'):
         os.remove(filename)
         print('file has been removed')
