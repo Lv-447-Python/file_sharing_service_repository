@@ -1,4 +1,5 @@
 """Flask configs"""
+import os
 from flask import Flask
 from flask_restful import Api
 from flask_sqlalchemy import SQLAlchemy
@@ -9,6 +10,9 @@ from flask_script import Manager
 
 APP = Flask(__name__)
 API = Api(APP)
+
+HOST = '127.0.0.1'
+PORT = 5000
 
 POSTGRES_URL = '127.0.0.1'
 POSTGRES_PORT = 5432
@@ -28,6 +32,8 @@ DB_URL = 'postgresql+psycopg2://{user}:{pw}@{url}:{port}/{db}'.format(
 APP.config['SQLALCHEMY_DATABASE_URI'] = DB_URL
 APP.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 APP.config['UPLOAD_FOLDER'] = 'generated_files/'
+
+UPLOADS_DIR = os.path.join(os.path.dirname(APP.root_path), APP.config['UPLOAD_FOLDER'])
 
 DATABASE = SQLAlchemy(APP)
 MARSHMALLOW = Marshmallow(APP)
