@@ -9,17 +9,25 @@ from file_sharing_service.configs import rabbit_configuration
 
 class EmailSendingView(Resource):
     def get(self):
+        """
+        GET method for sending email with attached file
+
+        """
         if 'filename' not in request.args:
-            return make_response(jsonify({
-                'message': 'There is no filename in your request'
-            }),
-                status.HTTP_400_BAD_REQUEST)
+            return make_response(
+                jsonify({
+                    'message': 'There is no filename in your request'
+                }),
+                status.HTTP_400_BAD_REQUEST
+            )
 
         if 'email' not in request.args:
-            return make_response(jsonify({
-                'message': 'There is no email in your request'
-            }),
-                status.HTTP_400_BAD_REQUEST)
+            return make_response(
+                jsonify({
+                    'message': 'There is no email in your request'
+                }),
+                status.HTTP_400_BAD_REQUEST
+            )
 
         file_data = {
             'filename': request.args.get('filename'),
@@ -32,10 +40,12 @@ class EmailSendingView(Resource):
             routing_key=rabbit_configuration.EMAIL_ROUTING_KEY
         )
 
-        return make_response(jsonify({
-            'message': 'Message was sent to the queue ' + rabbit_configuration.EMAIL_QUEUE_NAME
-        }),
-            status.HTTP_200_OK)
+        return make_response(
+            jsonify({
+                'message': 'Message was sent to the queue ' + rabbit_configuration.EMAIL_QUEUE_NAME
+            }),
+            status.HTTP_200_OK
+        )
 
 
 API.add_resource(EmailSendingView, '/email')

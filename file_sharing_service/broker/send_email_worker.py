@@ -2,7 +2,6 @@
 import smtplib
 import ssl
 import os
-import zipfile
 from email import encoders
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
@@ -11,16 +10,14 @@ from file_sharing_service.configs import smtp_configuration
 from file_sharing_service import APP
 
 
-def make_archive(filepath):
-    zip_filename = f'{filepath}.zip'
-    zip_file = zipfile.ZipFile(filepath, 'w')
-    zip_file.write(filepath, compress_type=zipfile.ZIP_DEFLATED)
-    zip_file.close()
-
-    return zip_filename
-
-
 def send_email(file_data):
+    """
+    Function for sending emails with attached files
+    Args:
+        file_data:
+
+
+    """
     subject = 'FilterMe File'
     body = '''This email was sent by FilterMe. Your file was successfully generated.'''
 
@@ -36,12 +33,6 @@ def send_email(file_data):
     file_sharing_dir = os.path.dirname(APP.root_path)
     uploads_dir = os.path.join(file_sharing_dir, APP.config['UPLOAD_FOLDER'])
     filepath = uploads_dir + filename
-
-    file_size = os.path.getsize(filepath)
-
-    if file_size > 1024:
-        print('archive')
-        filename = make_archive(filepath)
 
     try:
         with open(filepath, 'rb') as attachment:
@@ -59,9 +50,12 @@ def send_email(file_data):
     text = message.as_string()
 
     context = ssl.create_default_context()
+
     with smtplib.SMTP_SSL('smtp.gmail.com', port=smtp_configuration.PORT, context=context) as server:
         server.login(smtp_configuration.SENDER_EMAIL, smtp_configuration.SENDER_PASSWORD)
         server.sendmail(smtp_configuration.SENDER_EMAIL, receiver_email, text)
+
+    print(f'Email with attached file {filename} was sent to {receiver_email}')
 
     if filename.endswith('zip'):
         os.remove(filename)
