@@ -4,6 +4,16 @@ import pika
 
 
 def emit_sending(file_data, queue_name, routing_key):
+    """
+    Function for pushing messages in RabbitMQ queues
+    Args:
+        file_data:
+        queue_name:
+        routing_key:
+
+    Returns:
+
+    """
     connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
     channel = connection.channel()
 

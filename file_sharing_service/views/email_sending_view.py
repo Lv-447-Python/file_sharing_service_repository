@@ -1,18 +1,37 @@
 """View for sending email with file"""
-from flask import request
+from flask import request, make_response, jsonify
+from flask_api import status
 from flask_restful import Resource
 from file_sharing_service.broker.event_handlers import emit_sending
-from file_sharing_service.configs.flask_configuration import API
+from file_sharing_service import API
 from file_sharing_service.configs import rabbit_configuration
 
 
 class EmailSendingView(Resource):
     def get(self):
+        """
+        GET method for sending email with attached file
+
+        """
+        if 'filename' not in request.args:
+            return make_response(
+                jsonify({
+                    'message': 'There is no filename in your request'
+                }),
+                status.HTTP_400_BAD_REQUEST
+            )
+
+        if 'email' not in request.args:
+            return make_response(
+                jsonify({
+                    'message': 'There is no email in your request'
+                }),
+                status.HTTP_400_BAD_REQUEST
+            )
+
         file_data = {
-            'user_id': request.args.get('user_id', type=int),
-            'file_id': request.args.get('file_id', type=int),
-            'filter_id': request.args.get('filter_id', type=int),
-            'email': request.args.get('email', type=str)
+            'filename': request.args.get('filename'),
+            'email': request.args.get('email')
         }
 
         emit_sending(
@@ -21,10 +40,12 @@ class EmailSendingView(Resource):
             routing_key=rabbit_configuration.EMAIL_ROUTING_KEY
         )
 
-        return {
-            'status': 200,
-            'msg': 'Message was sent to the queue ' + rabbit_configuration.EMAIL_QUEUE_NAME
-        }
+        return make_response(
+            jsonify({
+                'message': 'Message was sent to the queue ' + rabbit_configuration.EMAIL_QUEUE_NAME
+            }),
+            status.HTTP_200_OK
+        )
 
 
 API.add_resource(EmailSendingView, '/email')

@@ -2,44 +2,19 @@
 import ast
 import pika
 from file_sharing_service.broker.send_email_worker import send_email
-from file_sharing_service.broker.generate_link_worker import send_file
-
-
-def parse_file_data(bytes_data):
-    file_data_decoded = bytes_data.decode('utf-8')
-    file_data_dict = ast.literal_eval(file_data_decoded)
-
-    user_id = int(file_data_dict['user_id'])
-    filter_id = int(file_data_dict['filter_id'])
-    file_id = int(file_data_dict['file_id'])
-    try:
-        email = file_data_dict['email']
-    except KeyError:
-        email = None
-
-    file_data = {
-        'user_id': user_id,
-        'filter_id': filter_id,
-        'file_id': file_id,
-        'email': email
-    }
-
-    return file_data
+from file_sharing_service.broker.delete_timer_worker import deletion_timer
 
 
 def callback(ch, method, properties, body):
-    try:
-        file_data = parse_file_data(body)
-    except KeyError:
-        print('No email in file data')
-        return None
+    file_data_decoded = body.decode('utf-8')
+    file_data = ast.literal_eval(file_data_decoded)
 
     if method.routing_key == 'email_sending':
+        print(f'Message {file_data}. Routing key: {method.routing_key}')
         send_email(file_data)
-        print('Email sent')
-    elif method.routing_key == 'files_sending':
-        send_file(file_data)
-        print('File sent')
+    elif method.routing_key == 'file_deletion_key':
+        print(f'Message {file_data}. Routing key: {method.routing_key}')
+        deletion_timer(file_data)
     else:
         print('Invalid routing key')
 
