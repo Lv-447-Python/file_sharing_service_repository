@@ -11,7 +11,7 @@ from flask_script import Manager
 APP = Flask(__name__)
 API = Api(APP)
 
-HOST = '127.0.0.1'
+HOST = '0.0.0.0'
 PORT = 5000
 
 POSTGRES_URL = '127.0.0.1'
