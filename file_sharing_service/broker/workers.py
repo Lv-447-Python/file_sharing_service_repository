@@ -5,24 +5,15 @@ from file_sharing_service.broker.send_email_worker import send_email
 from file_sharing_service.broker.delete_timer_worker import deletion_timer
 
 
-def parse_file_data(bytes_data):
-    file_data_decoded = bytes_data.decode('utf-8')
-    file_data_dict = ast.literal_eval(file_data_decoded)
-
-    return file_data_dict
-
-
 def callback(ch, method, properties, body):
-    try:
-        file_data = parse_file_data(body)
-    except KeyError:
-        print('No email in file data')
-        return None
+    file_data_decoded = body.decode('utf-8')
+    file_data = ast.literal_eval(file_data_decoded)
 
     if method.routing_key == 'email_sending':
+        print(f'Message {file_data}. Routing key: {method.routing_key}')
         send_email(file_data)
-        print('Email sent')
     elif method.routing_key == 'file_deletion_key':
+        print(f'Message {file_data}. Routing key: {method.routing_key}')
         deletion_timer(file_data)
     else:
         print('Invalid routing key')
