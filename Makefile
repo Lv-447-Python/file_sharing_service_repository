@@ -4,6 +4,8 @@ VENV_NAME?=venv
 PYTHON=${VENV_NAME}/bin/python3
 
 .DEFAULT: help
+all: setup test run
+
 help:
 	@echo "make setup"
 	@echo "       full "
@@ -16,14 +18,18 @@ help:
 
 
 setup: $(VENV_NAME)/bin/activate
-$(VENV_NAME)/bin/activate: requirements.txt
 	test -d $(VENV_NAME) || virtualenv -p python3 $(VENV_NAME)
 	${PYTHON} -m pip install -U pip
 	${PYTHON} -m pip install -r requirements.txt
 	touch $(VENV_NAME)/bin/activate
-	make db_migrate
+ifeq ($(wildcard /migrations/.*),)
+	@echo "Found ~/migrations/."
 	${PYTHON} manage.py db upgrade
 	${PYTHON} manage.py db migrate
+else
+	make db_migrate
+endif
+
 
 db_migrate: $(VENV_NAME)/bin/activate
 	${PYTHON} manage.py db init
@@ -31,10 +37,10 @@ db_migrate: $(VENV_NAME)/bin/activate
 	${PYTHON} manage.py db migrate
 
 run: $(VENV_NAME)/bin/activate
-	${PYTHON} run.py
+	${PYTHON} app.py
 
 test:
-	echo "Will be soon..."
+	@echo "Will be soon..."
 
 lint: $(VENV_NAME)/bin/activate
 	$(PYTHON) -m pylint file_sharing_service

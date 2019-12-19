@@ -14,22 +14,24 @@ API = Api(APP)
 HOST = '0.0.0.0'
 PORT = 5000
 
-POSTGRES_URL = '127.0.0.1'
-POSTGRES_PORT = 5432
+# POSTGRES_URL = '0.0.0.0'
+# POSTGRES_PORT = 5432
+#
+# POSTGRES_USER = 'postgres'
+# POSTGRES_PW = 'Not4U^3l'
+# POSTGRES_DB = 'Sharing_DB'
+#
 
-POSTGRES_USER = 'postgres'
-POSTGRES_PW = 'Not4U^3l'
-POSTGRES_DB = 'Sharing_DB'
+POSTGRES = {
+    'user': 'postgres',
+    'pw': '123',
+    'db': 'Sharing_DB',
+    'host': 'db',
+    'port': '5432',
+}
+APP.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://%(user)s:\
+%(pw)s@%(host)s:%(port)s/%(db)s' % POSTGRES
 
-DB_URL = 'postgresql+psycopg2://{user}:{pw}@{url}:{port}/{db}'.format(
-    user=POSTGRES_USER,
-    pw=POSTGRES_PW,
-    url=POSTGRES_URL,
-    port=POSTGRES_PORT,
-    db=POSTGRES_DB
-)
-
-APP.config['SQLALCHEMY_DATABASE_URI'] = DB_URL
 APP.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 APP.config['UPLOAD_FOLDER'] = 'generated_files/'
 
