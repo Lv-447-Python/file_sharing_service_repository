@@ -5,33 +5,32 @@ from flask_restful import Resource
 from file_sharing_service.broker.event_handlers import emit_sending
 from file_sharing_service import API
 from file_sharing_service.configs import rabbit_configuration
+from file_sharing_service.models.generated_file import GeneratedFile
+from file_sharing_service.serializers.generated_file_schema import GeneratedFileSchema
 
 
 class EmailSendingView(Resource):
-    def get(self):
+    def get(self, generated_file_id, receiver_email):
         """
         GET method for sending email with attached file
 
         """
-        if 'filename' not in request.args:
-            return make_response(
-                jsonify({
-                    'message': 'There is no filename in your request'
-                }),
-                status.HTTP_400_BAD_REQUEST
-            )
 
-        if 'email' not in request.args:
+        generated_file = GeneratedFile.query.get(generated_file_id)
+        schema = GeneratedFileSchema()
+        generated_file_json = schema.dump(generated_file)
+
+        if not generated_file:
             return make_response(
                 jsonify({
-                    'message': 'There is no email in your request'
+                    'message': f'File was not found'
                 }),
-                status.HTTP_400_BAD_REQUEST
+                status.HTTP_204_NO_CONTENT
             )
 
         file_data = {
-            'filename': request.args.get('filename'),
-            'email': request.args.get('email')
+            'file': generated_file_json,
+            'receiver_email': receiver_email
         }
 
         emit_sending(
@@ -48,4 +47,4 @@ class EmailSendingView(Resource):
         )
 
 
-API.add_resource(EmailSendingView, '/email')
+API.add_resource(EmailSendingView, '/email/<int:generated_file_id>/<string:receiver_email>')
