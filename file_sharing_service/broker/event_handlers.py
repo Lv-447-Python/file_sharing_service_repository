@@ -1,6 +1,7 @@
 """RabbitMQ Producer"""
 import json
 import pika
+from file_sharing_service.logger.logger import LOGGER
 
 
 def emit_sending(file_data, queue_name, routing_key):
@@ -15,6 +16,14 @@ def emit_sending(file_data, queue_name, routing_key):
 
     """
     connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+    # credentials = pika.PlainCredentials('admin', 'admin')
+    # connection = pika.BlockingConnection(pika.ConnectionParameters(
+    #     '0.0.0.0',
+    #     5672,
+    #     '/',
+    #     credentials
+    # ))
+
     channel = connection.channel()
 
     exchange_name = 'exchange_files'
@@ -36,5 +45,5 @@ def emit_sending(file_data, queue_name, routing_key):
         )
     )
 
-    print(f'{routing_key} sent to {exchange_name} with message {file_data}')
+    LOGGER.info(f'{routing_key} sent to {exchange_name} with message {file_data}')
     connection.close()

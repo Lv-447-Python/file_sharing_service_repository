@@ -2,6 +2,7 @@
 import datetime
 import time
 import requests
+from file_sharing_service.logger.logger import LOGGER
 
 
 def deletion_timer(file_data):
@@ -20,7 +21,7 @@ def deletion_timer(file_data):
     try:
         time.sleep((deletion_time - datetime.datetime.now()).total_seconds())
         response = requests.delete(f'http://127.0.0.1:5000/download/{file_id}')
-        print('API call for deletion was sent')
-        print(f'Response: {response.json()}')
+        LOGGER.info('API call for deletion was sent')
+        LOGGER.info(f'Response: {response.json()}')
     except ValueError:
-        print('API call for deletion was not sent, Value Error')
+        LOGGER.info('API call for deletion was not sent, Value Error')

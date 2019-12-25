@@ -8,6 +8,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from file_sharing_service.configs import smtp_configuration
 from file_sharing_service import APP
+from file_sharing_service.logger.logger import LOGGER
 
 
 def send_email(file_data):
@@ -23,12 +24,15 @@ def send_email(file_data):
 
     message = MIMEMultipart()
     message['From'] = smtp_configuration.SENDER_EMAIL
-    message['To'] = file_data['email']
+    message['To'] = file_data['receiver_email']
     message['Subject'] = subject
     message.attach(MIMEText(body, 'plain'))
-    receiver_email = file_data['email']
 
-    filename = file_data['filename']
+    file = file_data['file']
+    receiver_email = file_data['receiver_email']
+
+    filename = file['file_name'].strip()
+    LOGGER.info(file)
 
     file_sharing_dir = os.path.dirname(APP.root_path)
     uploads_dir = os.path.join(file_sharing_dir, APP.config['UPLOAD_FOLDER'])
@@ -40,7 +44,7 @@ def send_email(file_data):
             part.set_payload(attachment.read())
 
     except FileNotFoundError:
-        print('File not found')
+        LOGGER.error(f'File with filename {filename} was not found')
         return None
 
     encoders.encode_base64(part)
@@ -55,8 +59,4 @@ def send_email(file_data):
         server.login(smtp_configuration.SENDER_EMAIL, smtp_configuration.SENDER_PASSWORD)
         server.sendmail(smtp_configuration.SENDER_EMAIL, receiver_email, text)
 
-    print(f'Email with attached file {filename} was sent to {receiver_email}')
-
-    if filename.endswith('zip'):
-        os.remove(filename)
-        print('file has been removed')
+    LOGGER.info(f'Email with attached file {filename} was sent to {receiver_email}')

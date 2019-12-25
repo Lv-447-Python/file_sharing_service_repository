@@ -3,6 +3,7 @@ import ast
 import pika
 from file_sharing_service.broker.send_email_worker import send_email
 from file_sharing_service.broker.delete_timer_worker import deletion_timer
+from file_sharing_service.logger.logger import LOGGER
 
 
 def callback(ch, method, properties, body):
@@ -23,9 +24,23 @@ def callback(ch, method, properties, body):
 
 def manage_jobs(queue_name, binding_key):
     connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+    # credentials = pika.PlainCredentials('admin', 'admin')
+    # connection = pika.BlockingConnection(pika.ConnectionParameters(
+    #     '0.0.0.0',
+    #     5677,
+    #     '/',
+    #     credentials
+    # ))
+
     channel = connection.channel()
 
     exchange_name = 'exchange_files'
+
+    channel.exchange_declare(
+        exchange=exchange_name,
+        exchange_type='direct',
+        durable=True
+    )
 
     queue_choose = channel.queue_declare(queue=queue_name)
     queue_chosen = queue_choose.method.queue
@@ -34,7 +49,7 @@ def manage_jobs(queue_name, binding_key):
                        queue=queue_chosen,
                        routing_key=bytes(binding_key, encoding='UTF-8'))
 
-    print('[*] Waiting for messages')
+    LOGGER.info('[*] Waiting for messages')
 
     channel.basic_qos(prefetch_count=1)
     channel.basic_consume(

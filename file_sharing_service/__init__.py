@@ -24,9 +24,11 @@ PORT = 5000
 
 POSTGRES = {
     'user': 'postgres',
-    'pw': '123',
-    'db': 'Sharing_DB',
-    'host': 'db',
+    'pw': 'Not4U^3l',
+    # 'pw': '123',
+    'db': 'sharing_db',
+    # 'host': 'db',
+    'host': 'localhost',
     'port': '5432',
 }
 APP.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://%(user)s:\
@@ -39,6 +41,9 @@ UPLOADS_DIR = os.path.join(os.path.dirname(APP.root_path), APP.config['UPLOAD_FO
 
 DATABASE = SQLAlchemy(APP)
 MARSHMALLOW = Marshmallow(APP)
+
 MIGRATE = Migrate(APP, DATABASE)
 MANAGER = Manager(APP)
 MANAGER.add_command('db', MigrateCommand)
+
+from file_sharing_service.models.generated_file import GeneratedFile
