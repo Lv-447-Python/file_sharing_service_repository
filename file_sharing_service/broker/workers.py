@@ -23,14 +23,14 @@ def callback(ch, method, properties, body):
 
 
 def manage_jobs(queue_name, binding_key):
-    connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
-    # credentials = pika.PlainCredentials('admin', 'admin')
-    # connection = pika.BlockingConnection(pika.ConnectionParameters(
-    #     '0.0.0.0',
-    #     5677,
-    #     '/',
-    #     credentials
-    # ))
+    # connection = pika.BlockingConnection(pika.ConnectionParameters(''))
+    credentials = pika.PlainCredentials('admin', 'admin')
+    connection = pika.BlockingConnection(pika.ConnectionParameters(
+        'rabbitmq',
+        5677,
+        '/',
+        credentials
+    ))
 
     channel = connection.channel()
 
@@ -38,8 +38,7 @@ def manage_jobs(queue_name, binding_key):
 
     channel.exchange_declare(
         exchange=exchange_name,
-        exchange_type='direct',
-        durable=True
+        exchange_type='direct'
     )
 
     queue_choose = channel.queue_declare(queue=queue_name)

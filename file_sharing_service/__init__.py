@@ -24,13 +24,12 @@ PORT = 5000
 
 POSTGRES = {
     'user': 'postgres',
-    'pw': 'Not4U^3l',
-    # 'pw': '123',
-    'db': 'sharing_db',
-    # 'host': 'db',
-    'host': 'localhost',
+    'pw': '',
+    'db': 'SharingDB',
+    'host': 'db',
     'port': '5432',
 }
+
 APP.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://%(user)s:\
 %(pw)s@%(host)s:%(port)s/%(db)s' % POSTGRES
 

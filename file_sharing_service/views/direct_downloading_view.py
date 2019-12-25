@@ -56,7 +56,7 @@ class GeneratedFileLoading(Resource):
         LOGGER.info(input_file.__dict__)
         schema = GeneratedFileSchema()
         GeneratedFileLoading.add_to_db(input_file)
-        generated_file.save(os.path.join(APP.config['UPLOAD_FOLDER'], filename))
+        # generated_file.save(os.path.join(APP.config['UPLOAD_FOLDER'], filename))
 
         data = schema.dump(input_file)
         emit_sending(data, rabbit_configuration.FILE_DELETION_NAME, rabbit_configuration.FILE_DELETION_KEY)
