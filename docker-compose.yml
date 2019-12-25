@@ -3,14 +3,25 @@ version: '3'
 services:
   db:
     image: postgres:12-alpine
-
+    ports:
+    - "4000:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 123
       POSTGRES_DB: Sharing_DB
+    restart: always
 
-#      PG_DATA: /var/lib/postgresql/data/pgdata
-
+  rabbitmq:
+    image: rabbitmq:3.8-management-alpine
+#    ports:
+#      - "5672:5672"
+#      - "15672:15672"
+    labels:
+      NAME: "rabbitmq"
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=admin
+      - RABBITMQ_DEFAULT_VHOST=vhost
     restart: always
 
   web:
@@ -19,7 +30,7 @@ services:
     - .:/file_sharing_service
     command: >
       /bin/bash -c "
-        sleep 20
+        sleep 10
         python3 manage.py db init
         python3 manage.py db upgrade
         python3 manage.py db migrate
@@ -32,8 +43,7 @@ services:
     restart: always
     links:
       - db
+      - rabbitmq
     depends_on:
       - db
-
-#volumes:
-#  postgres_data:
+      - rabbitmq
