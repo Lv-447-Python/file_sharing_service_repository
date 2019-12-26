@@ -23,14 +23,13 @@ def callback(ch, method, properties, body):
 
 
 def manage_jobs(queue_name, binding_key):
-    connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
-    # credentials = pika.PlainCredentials('admin', 'admin')
-    # connection = pika.BlockingConnection(pika.ConnectionParameters(
-    #     '0.0.0.0',
-    #     5677,
-    #     '/',
-    #     credentials
-    # ))
+    credentials = pika.PlainCredentials('admin', 'admin')
+    connection = pika.BlockingConnection(pika.ConnectionParameters(
+        'rabbitmq',
+        5672,
+        '/',
+        credentials
+    ))
 
     channel = connection.channel()
 

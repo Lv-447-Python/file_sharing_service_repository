@@ -56,4 +56,4 @@ class EmailSendingView(Resource):
         )
 
 
-API.add_resource(EmailSendingView, '/email/<int:generated_file_id>/')
+API.add_resource(EmailSendingView, '/file-sharing/api/email/<int:generated_file_id>/')

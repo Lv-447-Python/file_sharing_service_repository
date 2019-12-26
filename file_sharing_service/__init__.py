@@ -14,21 +14,11 @@ API = Api(APP)
 HOST = '0.0.0.0'
 PORT = 5000
 
-# POSTGRES_URL = '0.0.0.0'
-# POSTGRES_PORT = 5432
-#
-# POSTGRES_USER = 'postgres'
-# POSTGRES_PW = 'Not4U^3l'
-# POSTGRES_DB = 'Sharing_DB'
-#
-
 POSTGRES = {
     'user': 'postgres',
-    'pw': 'Not4U^3l',
-    # 'pw': '123',
+    'pw': '',
     'db': 'sharing_db',
-    # 'host': 'db',
-    'host': 'localhost',
+    'host': 'db',
     'port': '5432',
 }
 APP.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://%(user)s:\

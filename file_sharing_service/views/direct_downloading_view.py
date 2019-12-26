@@ -124,7 +124,7 @@ class GeneratedFileLoading(Resource):
         filename = GeneratedFileLoading.check_filename(filename)
 
         generated_file.filename = filename
-        generated_file.save(os.path.join(APP.config['UPLOAD_FOLDER'], filename))
+        # generated_file.save(os.path.join(APP.config['UPLOAD_FOLDER'], filename))
 
         input_file = GeneratedFile(
             file_name=filename,
@@ -217,5 +217,6 @@ class GeneratedFileInterface(Resource):
             )
 
 
-API.add_resource(GeneratedFileInterface, '/download/<string:generated_file_name>')
-API.add_resource(GeneratedFileLoading, '/download/')
+
+API.add_resource(GeneratedFileInterface, '/file-sharing/api/download/<string:generated_file_name>')
+API.add_resource(GeneratedFileLoading, '/file-sharing/api/download/')

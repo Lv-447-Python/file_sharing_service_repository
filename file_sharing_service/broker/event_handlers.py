@@ -15,14 +15,13 @@ def emit_sending(file_data, queue_name, routing_key):
     Returns:
 
     """
-    connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
-    # credentials = pika.PlainCredentials('admin', 'admin')
-    # connection = pika.BlockingConnection(pika.ConnectionParameters(
-    #     '0.0.0.0',
-    #     5672,
-    #     '/',
-    #     credentials
-    # ))
+    credentials = pika.PlainCredentials('admin', 'admin')
+    connection = pika.BlockingConnection(pika.ConnectionParameters(
+        'rabbitmq',
+        5672,
+        '/',
+        credentials
+    ))
 
     channel = connection.channel()
 
