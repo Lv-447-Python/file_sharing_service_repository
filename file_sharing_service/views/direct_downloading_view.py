@@ -161,34 +161,34 @@ class GeneratedFileInterface(Resource):
         DATABASE.session.commit()
         LOGGER.info(f'File {file} was deleted from the database')
 
-    def get(self, generated_file_id):
+    def get(self, generated_file_name):
         """
         GET method for downloading files
         Args:
-            generated_file_id:
+            generated_file_name:
 
         Returns:
 
         """
         try:
-            filename = GeneratedFile.query.get(generated_file_id).file_name
+            filename = GeneratedFile.query.get(generated_file_name).file_name
 
             return send_file(UPLOADS_DIR + filename, attachment_filename=filename)
         except AttributeError:
             return make_response(
                 jsonify({
-                    'message': f'File with id {generated_file_id} not found'
+                    'message': f'File with name {generated_file_name} not found'
                 }),
                 status.HTTP_400_BAD_REQUEST
             )
 
-    def delete(self, generated_file_id):
+    def delete(self, generated_file_name):
         """
         DELETE method for deleting file from database and storage
         Args:
-            generated_file_id:
+            generated_file_name:
         """
-        generated_file = GeneratedFile.query.get(generated_file_id)
+        generated_file = GeneratedFile.query.get(generated_file_name)
         if generated_file:
             filename = generated_file.file_name
             try:
@@ -204,18 +204,18 @@ class GeneratedFileInterface(Resource):
             GeneratedFileInterface.remove_from_db(generated_file)
             return make_response(
                 jsonify({
-                    'message': f'File with id {generated_file_id} was deleted'
+                    'message': f'File with id {generated_file_name} was deleted'
                 }),
                 status.HTTP_200_OK
             )
         else:
             return make_response(
                 jsonify({
-                    'message': f'File with id {generated_file_id} not found'
+                    'message': f'File with id {generated_file_name} not found'
                 }),
                 status.HTTP_400_BAD_REQUEST
             )
 
 
-API.add_resource(GeneratedFileInterface, '/download/<int:generated_file_id>')
+API.add_resource(GeneratedFileInterface, '/download/<string:generated_file_name>')
 API.add_resource(GeneratedFileLoading, '/download/')
