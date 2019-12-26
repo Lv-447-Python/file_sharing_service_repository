@@ -38,6 +38,46 @@ class GeneratedFileLoading(Resource):
             else:
                 return filename
 
+    def get(self):
+        """
+        GET method for check if file already generated
+
+        """
+        if 'filter_id' not in request.headers:
+            return make_response(
+                jsonify({
+                    'message': 'NO filter_id in headers'
+                }),
+                status.HTTP_400_BAD_REQUEST
+            )
+        elif 'input_file_id' not in request.headers:
+            return make_response(
+                jsonify({
+                    'message': 'NO input_file_id in headers'
+                }),
+                status.HTTP_400_BAD_REQUEST
+            )
+
+        filter_id = request.headers['filter_id']
+        input_file_id = request.headers['input_file_id']
+        files = GeneratedFile.query.filter_by(filter_id=filter_id, input_file_id=input_file_id).first()
+
+        if files:
+            return make_response(
+                jsonify({
+                    'message': 'Ok',
+                    'link': files.file_link
+                }),
+                status.HTTP_200_OK
+            )
+        else:
+            return make_response(
+                jsonify({
+                    'message': 'File not generated',
+                }),
+                status.HTTP_200_OK
+            )
+
     def post(self):
         """
         POST method for adding file to database and generate downloading link
@@ -48,6 +88,20 @@ class GeneratedFileLoading(Resource):
             return make_response(
                 jsonify({
                     'message': 'There is no file in your request'
+                }),
+                status.HTTP_400_BAD_REQUEST
+            )
+        elif 'filter_id' not in request.form:
+            return make_response(
+                jsonify({
+                    'message': 'There is no filter_id in your request'
+                }),
+                status.HTTP_400_BAD_REQUEST
+            )
+        elif 'input_file_id' not in request.form:
+            return make_response(
+                jsonify({
+                    'message': 'There is no input_file_id in your request'
                 }),
                 status.HTTP_400_BAD_REQUEST
             )
@@ -64,16 +118,20 @@ class GeneratedFileLoading(Resource):
             )
 
         file_size = os.path.getsize(os.path.join(APP.config['UPLOAD_FOLDER'], filename))
+        filter_id = request.form['filter_id']
+        input_file_id = request.form['input_file_id']
 
         filename = GeneratedFileLoading.check_filename(filename)
+
         generated_file.filename = filename
         generated_file.save(os.path.join(APP.config['UPLOAD_FOLDER'], filename))
+
         input_file = GeneratedFile(
             file_name=filename,
             file_link=f'{HOST}:{PORT}/download/{filename}',
             file_size=file_size,
-            input_file_id=1,
-            filter_id=1
+            input_file_id=input_file_id,
+            filter_id=filter_id
         )
 
         schema = GeneratedFileSchema()
