@@ -10,6 +10,7 @@ from file_sharing_service import API, APP, DATABASE, UPLOADS_DIR
 from file_sharing_service.models.generated_file import GeneratedFile
 from file_sharing_service.serializers.generated_file_schema import GeneratedFileSchema
 from file_sharing_service.logger.logger import LOGGER
+from file_sharing_service import HOST, PORT
 
 
 ALLOWED_EXTENSIONS = ('csv', 'xls', 'xlsx')
@@ -26,6 +27,16 @@ class GeneratedFileLoading(Resource):
         DATABASE.session.add(file)
         DATABASE.session.commit()
         LOGGER.info(f'File {file} was added to the database')
+
+    @staticmethod
+    def check_filename(filename):
+        old_filename = filename.split('.')[-2]
+        for i in range(1000):
+            if os.path.exists(os.path.join(APP.config['UPLOAD_FOLDER'], filename)):
+                new_filename = f'{old_filename}({i}).{filename.split(".")[-1]}'
+                filename = new_filename
+            else:
+                return filename
 
     def post(self):
         """
@@ -52,9 +63,18 @@ class GeneratedFileLoading(Resource):
                 status.HTTP_400_BAD_REQUEST
             )
 
-        generated_file.save(os.path.join(APP.config['UPLOAD_FOLDER'], filename))
         file_size = os.path.getsize(os.path.join(APP.config['UPLOAD_FOLDER'], filename))
-        input_file = GeneratedFile(filename, 'None', file_size=file_size)
+
+        filename = GeneratedFileLoading.check_filename(filename)
+        generated_file.filename = filename
+        generated_file.save(os.path.join(APP.config['UPLOAD_FOLDER'], filename))
+        input_file = GeneratedFile(
+            file_name=filename,
+            file_link=f'{HOST}:{PORT}/download/{filename}',
+            file_size=file_size,
+            input_file_id=1,
+            filter_id=1
+        )
 
         schema = GeneratedFileSchema()
         GeneratedFileLoading.add_to_db(input_file)
