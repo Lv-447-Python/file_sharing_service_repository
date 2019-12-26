@@ -1,7 +1,6 @@
 """Model for file_sharing_service"""
 
 import datetime
-import sqlalchemy
 from file_sharing_service import DATABASE
 
 

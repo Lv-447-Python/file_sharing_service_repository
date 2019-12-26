@@ -52,11 +52,12 @@ class GeneratedFileLoading(Resource):
                 status.HTTP_400_BAD_REQUEST
             )
 
-        input_file = GeneratedFile(filename, 'None', file_size=1)
-        LOGGER.info(input_file.__dict__)
+        generated_file.save(os.path.join(APP.config['UPLOAD_FOLDER'], filename))
+        file_size = os.path.getsize(os.path.join(APP.config['UPLOAD_FOLDER'], filename))
+        input_file = GeneratedFile(filename, 'None', file_size=file_size)
+
         schema = GeneratedFileSchema()
         GeneratedFileLoading.add_to_db(input_file)
-        generated_file.save(os.path.join(APP.config['UPLOAD_FOLDER'], filename))
 
         data = schema.dump(input_file)
         emit_sending(data, rabbit_configuration.FILE_DELETION_NAME, rabbit_configuration.FILE_DELETION_KEY)
@@ -91,14 +92,11 @@ class GeneratedFileInterface(Resource):
         Returns:
 
         """
-        LOGGER.info('here')
         try:
             filename = GeneratedFile.query.get(generated_file_id).file_name
-            LOGGER.info(filename)
 
             return send_file(UPLOADS_DIR + filename, attachment_filename=filename)
         except AttributeError:
-            LOGGER.info('here')
             return make_response(
                 jsonify({
                     'message': f'File with id {generated_file_id} not found'
