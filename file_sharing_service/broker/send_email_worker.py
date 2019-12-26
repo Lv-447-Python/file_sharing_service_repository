@@ -24,39 +24,44 @@ def send_email(file_data):
 
     message = MIMEMultipart()
     message['From'] = smtp_configuration.SENDER_EMAIL
-    message['To'] = file_data['receiver_email']
     message['Subject'] = subject
     message.attach(MIMEText(body, 'plain'))
 
     file = file_data['file']
-    receiver_email = file_data['receiver_email']
-
-    filename = file['file_name'].strip()
-    LOGGER.info(file)
+    email = file_data['email']
+    filename = file['file_name']
 
     file_sharing_dir = os.path.dirname(APP.root_path)
     uploads_dir = os.path.join(file_sharing_dir, APP.config['UPLOAD_FOLDER'])
     filepath = uploads_dir + filename
 
-    try:
-        with open(filepath, 'rb') as attachment:
-            part = MIMEBase('application', 'octet-stream')
-            part.set_payload(attachment.read())
+    if os.path.getsize(filepath) > 25 * 1024 * 1024:
+        part = f'Sorry, your file is too big to send it via email, but you can download it using the following link:\n'\
+               f'{file["file_link"]}'
 
-    except FileNotFoundError:
-        LOGGER.error(f'File with filename {filename} was not found')
-        return None
+        part = MIMEText(part, 'plain')
 
-    encoders.encode_base64(part)
-    part.add_header('Content-Disposition', f'attachment; filename={filename}')
+    else:
+        try:
+            with open(filepath, 'rb') as attachment:
+                part = MIMEBase('application', 'octet-stream')
+                part.set_payload(attachment.read())
+
+        except FileNotFoundError:
+            LOGGER.error(f'File with filename {filename} was not found')
+            return None
+
+        encoders.encode_base64(part)
+
+        part.add_header('Content-Disposition', f'attachment; filename={filename}')
 
     message.attach(part)
     text = message.as_string()
-
     context = ssl.create_default_context()
 
     with smtplib.SMTP_SSL('smtp.gmail.com', port=smtp_configuration.PORT, context=context) as server:
         server.login(smtp_configuration.SENDER_EMAIL, smtp_configuration.SENDER_PASSWORD)
-        server.sendmail(smtp_configuration.SENDER_EMAIL, receiver_email, text)
+        for receiver_email in email:
+            server.sendmail(smtp_configuration.SENDER_EMAIL, receiver_email, text)
 
-    LOGGER.info(f'Email with attached file {filename} was sent to {receiver_email}')
+    LOGGER.info(f'Email with attached file {filename} was sent to {email}')

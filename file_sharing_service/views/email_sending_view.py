@@ -7,10 +7,11 @@ from file_sharing_service import API
 from file_sharing_service.configs import rabbit_configuration
 from file_sharing_service.models.generated_file import GeneratedFile
 from file_sharing_service.serializers.generated_file_schema import GeneratedFileSchema
+import ast
 
 
 class EmailSendingView(Resource):
-    def get(self, generated_file_id, receiver_email):
+    def get(self, generated_file_id):
         """
         GET method for sending email with attached file
 
@@ -28,10 +29,18 @@ class EmailSendingView(Resource):
                 status.HTTP_204_NO_CONTENT
             )
 
+        email_args = request.args['email']
+        email_args = ast.literal_eval(email_args)
+
         file_data = {
             'file': generated_file_json,
-            'receiver_email': receiver_email
+            'email': email_args
         }
+
+        # print(type(file_data['email']))
+        # file_data_decoded = body.decode('utf-8')
+        # file = ast.literal_eval(file_data["email"])
+        # print(type(file))
 
         emit_sending(
             file_data,
@@ -47,4 +56,4 @@ class EmailSendingView(Resource):
         )
 
 
-API.add_resource(EmailSendingView, '/email/<int:generated_file_id>/<string:receiver_email>')
+API.add_resource(EmailSendingView, '/email/<int:generated_file_id>/')
