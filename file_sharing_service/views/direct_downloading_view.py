@@ -68,14 +68,14 @@ class GeneratedFileLoading(Resource):
                     'message': 'Ok',
                     'link': files.file_link
                 }),
-                status.HTTP_200_OK
+                status.HTTP_302_FOUND
             )
         else:
             return make_response(
                 jsonify({
                     'message': 'File not generated',
                 }),
-                status.HTTP_200_OK
+                status.HTTP_404_NOT_FOUND
             )
 
     def post(self):
