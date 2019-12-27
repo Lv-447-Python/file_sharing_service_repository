@@ -11,13 +11,13 @@ import ast
 
 
 class EmailSendingView(Resource):
-    def get(self, generated_file_id):
+    def get(self, generated_file_name):
         """
         GET method for sending email with attached file
 
         """
 
-        generated_file = GeneratedFile.query.get(generated_file_id)
+        generated_file = GeneratedFile.query.get(generated_file_name)
         schema = GeneratedFileSchema()
         generated_file_json = schema.dump(generated_file)
 
@@ -37,11 +37,6 @@ class EmailSendingView(Resource):
             'email': email_args
         }
 
-        # print(type(file_data['email']))
-        # file_data_decoded = body.decode('utf-8')
-        # file = ast.literal_eval(file_data["email"])
-        # print(type(file))
-
         emit_sending(
             file_data,
             queue_name=rabbit_configuration.EMAIL_QUEUE_NAME,
@@ -56,4 +51,4 @@ class EmailSendingView(Resource):
         )
 
 
-API.add_resource(EmailSendingView, '/file-sharing/api/email/<int:generated_file_id>/')
+API.add_resource(EmailSendingView, '/email/<string:generated_file_name>/')
